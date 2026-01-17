@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Lobby {{ game.code }}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Germania+One&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+        <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+    </head>
+    <body>
+        <main class="screen lobbyScreen" data-game-code="{{ game.code }}">
+            <div class="content lobbyContent">
+
+                <div class="lobbyHeader">
+                <div class="lobbyTitle">Lobby</div>
+
+                <div class="lobbyCode">
+                    Code:
+                    <span class="codePill" id="codeText">{{ game.code }}</span>
+                    <button class="copyBtn" id="copyCode" type="button">Copy</button>
+                </div>
+                </div>
+
+                <div class="lobbyCard">
+                <div class="cardTitle">Players</div>
+
+                <ul class="playerList" id="playerList">
+                    {% for pid, p in game.players.items() %}
+                    <li class="playerRow">
+                        <span class="playerName">
+                        {{ p.name }}
+                        {% if pid == game.host_id %}<span class="badge">HOST</span>{% endif %}
+                        {% if pid == player_id %}<span class="badge badgeMe">YOU</span>{% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="hint">This list auto-updates every ~2 seconds.</div>
+                </div>
+
+                <div class="lobbyFooter">
+                {% if is_host %}
+                    <button class="btn btnHost" type="button" id="startGame">
+                    START GAME
+                    </button>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('leave') }}">
+                    <button class="btn btnJoin" type="submit">LEAVE</button>
+                </form>
+                </div>
+
+            </div>
+        </main>
+        <div class="modalOverlay" id="roleModal" aria-hidden="true">
+        <div class="modal roleModal" role="dialog" aria-modal="true" aria-labelledby="roleTitle">
+            <div class="modalTitle" id="roleTitle">Your Role</div>
+            <div class="roleLogoWrap">
+            <img src="{{ url_for('static', filename='assets/logo.svg') }}" class="roleLogo" alt="Secret Hitler" />
+            </div>
+            <div class="roleName" id="roleName">Role</div>
+            <div class="roleInfo" id="roleInfo">Loading...</div>
+            <div class="modalActions">
+            <button class="btnSmall btnSmallPrimary" type="button" id="ackRole">I Understand</button>
+            </div>
+        </div>
+        </div>
+    </body>
+</html>

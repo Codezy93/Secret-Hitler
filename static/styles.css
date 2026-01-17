@@ -1,0 +1,986 @@
+@import url('https://fonts.googleapis.com/css2?family=Germania+One&display=swap');
+
+:root{
+  --coral: #f26a50;
+  --teal:  #65b3bf;
+  --ink:   #1f1f1f;
+  --ink2:  #3f3f3f;
+  --paper: #f5f5f5;
+}
+
+/* ============ Base ============ */
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+
+body{
+  margin: 0;
+  font-family: "Germania One", "Times New Roman", serif;
+  background: #fff;
+}
+
+.page{
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.frame{
+  width: min(920px, 96vw);
+  height: min(640px, 82vh);
+  border: 14px solid var(--paper);
+  background: var(--paper);
+}
+
+/* ============ Home Screen ============ */
+.screen{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--coral);
+}
+
+/* Diagonal teal triangle spanning full screen */
+.screen::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--teal);
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+  z-index: 0;
+}
+
+.content{
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 24px;
+}
+
+/* Logo */
+.logoImg{
+  display: block;
+  width: min(520px, 78vw);
+  height: auto;
+  filter: drop-shadow(18px 18px 0 rgba(0,0,0,0.5));
+}
+
+/* Flash messages */
+.flash{
+  width: min(420px, 84vw);
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.65);
+  color: #111;
+  font-weight: 700;
+}
+.flashItem + .flashItem{ margin-top: 6px; }
+
+/* Actions */
+.actions{
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+.actionForm{ margin: 0; }
+
+.btn{
+  width: min(340px, 70vw);
+  height: 56px;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-size: 20px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.15);
+  transition: transform .06s ease, box-shadow .06s ease, opacity .15s ease;
+}
+
+.btn:active{
+  transform: translateY(2px);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.12);
+}
+
+.btnHost{ background: var(--ink); }
+.btnJoin{ background: var(--ink2); }
+
+.resume{
+  margin-top: 4px;
+  color: rgba(0,0,0,0.7);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  background: rgba(255,255,255,0.55);
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.modalOverlay{
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(0,0,0,0.35);
+  z-index: 10;
+}
+.modalOverlay.open{ display: grid; }
+
+.modal{
+  width: min(420px, 90vw);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.95);
+  padding: 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+.modalTitle{
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.joinForm{ display: grid; gap: 14px; }
+.field{ display: grid; gap: 6px; }
+.label{ font-size: 13px; font-weight: 800; color: rgba(0,0,0,0.7); }
+
+.input{
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.15);
+  padding: 0 12px;
+  font-size: 16px;
+  outline: none;
+}
+.input:focus{ border-color: rgba(0,0,0,0.35); }
+
+.modalActions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btnSmall{
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 800;
+  background: rgba(0,0,0,0.1);
+}
+.btnSmallPrimary{
+  background: var(--ink);
+  color: #fff;
+}
+
+#roleModal{
+  z-index: 20;
+}
+
+.roleModal{
+  text-align: center;
+}
+
+.roleLogoWrap{
+  display: grid;
+  place-items: center;
+  margin: 6px 0 10px;
+}
+
+.roleLogo{
+  width: min(260px, 70vw);
+  height: auto;
+  filter: drop-shadow(10px 10px 0 rgba(0,0,0,0.25));
+}
+
+.roleName{
+  font-size: 22px;
+  font-weight: 900;
+  margin: 8px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.roleInfo{
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.75);
+  min-height: 44px;
+}
+
+/* ============ Lobby ============ */
+.lobbyScreen{
+  gap: 18px;
+  padding: 18px;
+  align-content: start;
+}
+
+.lobbyHeader{
+  width: min(720px, 92vw);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.lobbyTitle{
+  font-size: 34px;
+  font-weight: 950;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 6px 0 rgba(0,0,0,0.12);
+}
+
+.lobbyCode{
+  font-weight: 900;
+  color: rgba(0,0,0,0.75);
+  background: rgba(255,255,255,0.65);
+  padding: 10px 12px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.codePill{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  background: rgba(0,0,0,0.08);
+  padding: 6px 10px;
+  border-radius: 12px;
+}
+
+.copyBtn{
+  border: 0;
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 900;
+  background: rgba(0,0,0,0.12);
+}
+
+.lobbyCard{
+  width: min(720px, 92vw);
+  background: rgba(255,255,255,0.7);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.cardTitle{
+  font-size: 16px;
+  font-weight: 950;
+  margin-bottom: 10px;
+}
+
+.playerList{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.playerRow{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0,0,0,0.06);
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-weight: 900;
+}
+
+.badge{
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.14);
+}
+.badgeMe{
+  background: rgba(242,106,80,0.35);
+}
+
+.hint{
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(0,0,0,0.55);
+}
+
+.lobbyFooter{
+  width: min(720px, 92vw);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+
+/* ============ Room ============ */
+.roomScreen{
+  padding: 14px 16px 18px;
+}
+
+.roomTop{
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr minmax(160px, 200px);
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.roomLogo{
+  width: min(170px, 24vw);
+  height: auto;
+  filter: drop-shadow(10px 10px 0 rgba(0,0,0,0.3));
+}
+
+.roomTitle{
+  justify-self: center;
+  width: min(320px, 42vw);
+  height: auto;
+  filter: drop-shadow(6px 6px 0 rgba(0,0,0,0.2));
+}
+
+.roomTopRight{
+  justify-self: end;
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.roomCode{
+  background: #3b3b3b;
+  color: #fff;
+  border-radius: 18px;
+  padding: 6px 16px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+}
+
+.roomCode .codePill{
+  background: transparent;
+  color: #fff;
+  padding: 0;
+  letter-spacing: 1px;
+  font-size: 18px;
+}
+
+.roomLeave{
+  border: 0;
+  border-radius: 18px;
+  background: #3b3b3b;
+  color: #fff;
+  padding: 6px 18px;
+  font-size: 18px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+}
+
+.roomGrid{
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(190px, 220px) minmax(360px, 1fr) minmax(190px, 220px);
+  column-gap: 20px;
+  row-gap: 16px;
+  align-items: start;
+}
+
+.roomCol{
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  justify-items: center;
+  padding-top: 6px;
+}
+
+.cardStack,
+.pileCard{
+  position: relative;
+  border-radius: 14px;
+  padding: 14px;
+  width: min(200px, 92%);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.22);
+  border: 3px solid rgba(0,0,0,0.18);
+}
+
+.roomLeft .cardStack{
+  background: #f2cf6a;
+}
+
+.roomLeft .cardStack:last-child{
+  background: #f4f0d8;
+}
+
+.roomRight .pileCard{
+  background: #efe6c8;
+}
+
+.cardImg,
+.pileImg{
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  background: transparent;
+  object-fit: contain;
+  display: block;
+  max-height: 220px;
+}
+
+.pileOverlay{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.pileStack{
+  position: relative;
+  width: 70%;
+  height: 70%;
+}
+
+.pileStackCard{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70%;
+  height: auto;
+  transform: translate(-50%, -50%) translate(var(--stack-x, 0px), var(--stack-y, 0px))
+    rotate(var(--stack-rotate, 0deg));
+  filter: drop-shadow(0 4px 0 rgba(0,0,0,0.18));
+}
+
+.pileCount{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 24px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.roomCenter{
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 14px;
+}
+
+.boardStack{
+  display: grid;
+  gap: 16px;
+  background: transparent;
+  padding: 0;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.boardImg{
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: transparent;
+  max-height: 210px;
+  object-fit: contain;
+  box-shadow: none;
+}
+
+.boardWrap{
+  position: relative;
+  width: 100%;
+}
+
+.boardOverlay{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.boardPolicyRow{
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.boardPolicyRowFascist{
+  --slot-default-y: 50%;
+}
+
+.boardPolicyRowLiberal{
+  --slot-default-y: 50%;
+}
+
+.boardSlot{
+  position: absolute;
+  left: var(--slot-x, 50%);
+  top: var(--slot-y, var(--slot-default-y, 50%));
+  transform: translate(-50%, -50%);
+  width: clamp(28px, 6vw, 72px);
+  height: auto;
+  display: grid;
+  place-items: center;
+}
+
+.boardPolicyCard{
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 3px 0 rgba(0,0,0,0.18));
+}
+
+.voteRow{
+  justify-self: center;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: min(320px, 92%);
+}
+
+.voteRow.hidden{
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.roomState{
+  width: min(520px, 94%);
+  background: rgba(255,255,255,0.6);
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 2px solid rgba(0,0,0,0.12);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
+  display: grid;
+  gap: 6px;
+}
+
+.stateRow{
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.75);
+}
+
+.roomToast{
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translate(-50%, 8px);
+  background: rgba(40,40,40,0.95);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  z-index: 5;
+}
+
+.roomToast.show{
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+
+.roomStatus{
+  width: min(520px, 94%);
+  background: rgba(255,255,255,0.65);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
+  border: 2px solid rgba(0,0,0,0.12);
+}
+
+.statusRow{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.statusItem{
+  font-size: 14px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.75);
+}
+
+.roomElection{
+  width: min(520px, 94%);
+  background: rgba(255,255,255,0.7);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+  border: 2px solid rgba(0,0,0,0.12);
+}
+
+.roomPlayerList .playerRow{
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.electBtn{
+  border: 0;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-weight: 900;
+  cursor: pointer;
+  background: rgba(0,0,0,0.12);
+}
+
+.electBtnPrimary{
+  background: #1f1f1f;
+  color: #fff;
+}
+
+.electBtn[disabled]{
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.voteBtn{
+  border: 3px solid rgba(0,0,0,0.18);
+  border-radius: 12px;
+  padding: 10px;
+  background: #efe6c8;
+  cursor: pointer;
+  box-shadow: 0 7px 0 rgba(0,0,0,0.22);
+  width: 100%;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+
+.voteBtn:active{
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+
+.voteImg{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 900px){
+  .roomTop{
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .roomTopRight{
+    justify-items: center;
+  }
+
+  .roomGrid{
+    grid-template-columns: 1fr;
+  }
+}
+.flipCard{
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  perspective: 900px;
+}
+
+.flipInner{
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform .6s ease;
+}
+
+.flipFace{
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+}
+
+.flipFront{
+  transform: rotateY(180deg);
+}
+
+.flipCard.is-flipped .flipInner{
+  transform: rotateY(180deg);
+}
+
+.flipCard:focus-visible{
+  outline: 3px solid rgba(0,0,0,0.5);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+
+
+
+
+
+.electionModal{
+  width: min(520px, 92vw);
+}
+
+.electionModal .roomElection{
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.actionModal{
+  width: min(560px, 94vw);
+}
+
+.endOverlay{
+  z-index: 30;
+  background: radial-gradient(circle at top, rgba(240,210,160,0.3), rgba(0,0,0,0.75));
+}
+
+.endPanel{
+  width: min(920px, 94vw);
+  background: #15120f;
+  color: #f7efe5;
+  border-radius: 20px;
+  border: 3px solid rgba(255,214,150,0.4);
+  padding: 20px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+}
+
+.endHeader{
+  text-align: center;
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.endBadge{
+  display: inline-block;
+  align-self: center;
+  justify-self: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(242,106,80,0.2);
+  border: 2px solid rgba(242,106,80,0.5);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.endTitle{
+  font-size: clamp(26px, 4vw, 40px);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.endSubtitle{
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+}
+
+.endContent{
+  display: grid;
+  gap: 16px;
+}
+
+.endStats{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.endStatCard{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.endStatLabel{
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.endStatValue{
+  font-size: 22px;
+}
+
+.endRoles{
+  background: rgba(0,0,0,0.25);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.endSectionTitle{
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: rgba(255,255,255,0.6);
+}
+
+.endRoleList{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.endRoleRow{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.endRoleName{
+  font-size: 14px;
+}
+
+.endRoleMeta{
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.roleTag{
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.roleTagLiberal{
+  background: rgba(101,179,191,0.25);
+  border: 1px solid rgba(101,179,191,0.6);
+}
+
+.roleTagFascist{
+  background: rgba(242,106,80,0.25);
+  border: 1px solid rgba(242,106,80,0.6);
+}
+
+.roleTagHitler{
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,214,150,0.6);
+}
+
+.roleTagDead{
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.endActions{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.roomScreen.is-dissolving{
+  animation: roomDissolve 0.8s ease forwards;
+}
+
+@keyframes roomDissolve{
+  to{
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+.actionBody{
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.actionList{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.actionBtn{
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-weight: 900;
+  cursor: pointer;
+  background: rgba(0,0,0,0.12);
+}
+
+.actionBtnPrimary{
+  background: #1f1f1f;
+  color: #fff;
+}
+
+.policyRow{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.policyCard{
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 10px;
+  padding: 6px;
+  background: #efe6c8;
+  cursor: pointer;
+}
+
+.policyCard img{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.roomTitleWrap{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.roomStatusInline{
+  width: min(420px, 60vw);
+  background: rgba(255,255,255,0.55);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+  border-radius: 12px;
+}
+
+.roomStatusInline .statusRow{
+  grid-template-columns: 1fr 1fr;
+}
+
+.roomStatusInline .statusItem{
+  font-size: 12px;
+}

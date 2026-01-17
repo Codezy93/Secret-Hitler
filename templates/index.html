@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Secret Hitler (LAN)</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Germania+One&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+        <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+    </head>
+
+    <body>
+        <main class="screen">
+            <div class="content">
+                <!-- Logo -->
+                <div class="logoFace">
+                <img src="{{ url_for('static', filename='assets/logo.svg') }}" class="logoImg" />
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash">
+                    {% for m in messages %}
+                        <div class="flashItem">{{ m }}</div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="actions">
+                <button class="btn btnHost" type="button" id="openHost">HOST A GAME</button>
+                <button class="btn btnJoin" type="button" id="openJoin">JOIN A GAME</button>
+                </div>
+
+            </div>
+            <!-- Host Modal -->
+            <div class="modalOverlay" id="hostModal" aria-hidden="true">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="hostTitle">
+                <div class="modalTitle" id="hostTitle">Host a Game</div>
+
+                <form method="post" action="{{ url_for('host') }}" class="joinForm">
+                <label class="field">
+                    <span class="label">Your name</span>
+                    <input class="input" name="name" maxlength="18" placeholder="Host" required />
+                </label>
+
+                <div class="modalActions">
+                    <button class="btnSmall" type="button" id="closeHost">Cancel</button>
+                    <button class="btnSmall btnSmallPrimary" type="submit">Host</button>
+                </div>
+                </form>
+            </div>
+            </div>
+            <!-- Join Modal -->
+            <div class="modalOverlay" id="joinModal" aria-hidden="true">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
+                <div class="modalTitle" id="joinTitle">Join a Game</div>
+
+                <form method="post" action="{{ url_for('join') }}" class="joinForm">
+                <label class="field">
+                    <span class="label">8-digit code</span>
+                    <input
+                    class="input"
+                    name="code"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    maxlength="8"
+                    pattern="\d{8}"
+                    placeholder="12345678"
+                    required
+                    />
+                </label>
+
+                <label class="field">
+                    <span class="label">Name</span>
+                    <input class="input" name="name" maxlength="18" placeholder="Player 101" required />
+                </label>
+
+                <div class="modalActions">
+                    <button class="btnSmall" type="button" id="closeJoin">Cancel</button>
+                    <button class="btnSmall btnSmallPrimary" type="submit">Join</button>
+                </div>
+                </form>
+            </div>
+            </div>
+        </main>
+    </body>
+</html>

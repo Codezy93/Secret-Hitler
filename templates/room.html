@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Room {{ game.code }}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Germania+One&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+        <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+    </head>
+    <body>
+        <main class="screen roomScreen" data-game-code="{{ game.code }}">
+            <header class="roomTop">
+                <img
+                    class="roomLogo"
+                    src="{{ url_for('static', filename='assets/logo.svg') }}"
+                    alt="Secret Hitler"
+                />
+                <div class="roomTitleWrap">
+                    <img
+                        class="roomTitle"
+                        id="roomPlaque"
+                        src="{{ url_for('static', filename='assets/plaque.president.svg') }}"
+                        data-president="{{ url_for('static', filename='assets/plaque.president.svg') }}"
+                        data-chancellor="{{ url_for('static', filename='assets/plaque.chancellor.svg') }}"
+                        data-citizen="{{ url_for('static', filename='assets/plaque.citizen.svg') }}"
+                        alt="President"
+                    />
+                    <div class="roomStatus roomStatusInline">
+                        <div class="statusRow">
+                            <div class="statusItem">President: <span id="presidentName">-</span></div>
+                            <div class="statusItem">Chancellor: <span id="chancellorName">-</span></div>
+                        </div>
+                        <div class="statusRow">
+                            <div class="statusItem">Last President: <span id="lastPresidentName">-</span></div>
+                            <div class="statusItem">Last Chancellor: <span id="lastChancellorName">-</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="roomTopRight">
+                    <div class="roomCode">
+                        <span class="codePill" id="codeText">{{ game.code }}</span>
+                    </div>
+                    <form method="post" action="{{ url_for('leave') }}">
+                        <button class="roomLeave" type="submit">LEAVE</button>
+                    </form>
+                </div>
+            </header>
+
+            <section class="roomGrid">
+                <div class="roomCol roomLeft">
+                    <div class="cardStack">
+                        <button
+                            class="flipCard"
+                            type="button"
+                            data-card="membership"
+                            data-front-liberal="{{ url_for('static', filename='assets/membership.liberal.svg') }}"
+                            data-front-fascist="{{ url_for('static', filename='assets/membership.fascist.svg') }}"
+                            aria-label="Reveal party membership"
+                        >
+                            <span class="flipInner">
+                                <img
+                                    class="cardImg flipFace flipBack"
+                                    src="{{ url_for('static', filename='assets/membership.back.svg') }}"
+                                    alt="Party membership card back"
+                                />
+                                <img
+                                    class="cardImg flipFace flipFront"
+                                    src="{{ url_for('static', filename='assets/membership.back.svg') }}"
+                                    alt="Party membership card"
+                                />
+                            </span>
+                        </button>
+                    </div>
+                    <div class="cardStack">
+                        <button
+                            class="flipCard"
+                            type="button"
+                            data-card="role"
+                            data-front-liberal="{{ url_for('static', filename='assets/role.liberal.svg') }}"
+                            data-front-fascist="{{ url_for('static', filename='assets/role.fascist.svg') }}"
+                            data-front-hitler="{{ url_for('static', filename='assets/role.hitler.svg') }}"
+                            aria-label="Reveal your role"
+                        >
+                            <span class="flipInner">
+                                <img
+                                    class="cardImg flipFace flipBack"
+                                    src="{{ url_for('static', filename='assets/role.back.svg') }}"
+                                    alt="Role card back"
+                                />
+                                <img
+                                    class="cardImg flipFace flipFront"
+                                    src="{{ url_for('static', filename='assets/role.back.svg') }}"
+                                    alt="Role card"
+                                />
+                            </span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="roomCenter">
+                    <div class="boardStack">
+                        <div class="boardWrap">
+                            <img
+                                class="boardImg"
+                                src="{{ url_for('static', filename='assets/board.fascist.svg') }}"
+                                alt="Fascist board"
+                            />
+                            <div class="boardOverlay">
+                                <div
+                                    class="boardPolicyRow boardPolicyRowFascist"
+                                    id="fascistPolicyRow"
+                                    data-max="6"
+                                    data-policy="fascist"
+                                ></div>
+                            </div>
+                        </div>
+                        <div class="boardWrap">
+                            <img
+                                class="boardImg"
+                                src="{{ url_for('static', filename='assets/board.liberal.svg') }}"
+                                alt="Liberal board"
+                            />
+                            <div class="boardOverlay">
+                                <div
+                                    class="boardPolicyRow boardPolicyRowLiberal"
+                                    id="liberalPolicyRow"
+                                    data-max="5"
+                                    data-policy="liberal"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="voteRow hidden">
+                        <button class="voteBtn" type="button" aria-label="Vote yes" id="voteJa">
+                            <img
+                                class="voteImg"
+                                src="{{ url_for('static', filename='assets/vote.ja.svg') }}"
+                                alt="Ja"
+                            />
+                        </button>
+                        <button class="voteBtn" type="button" aria-label="Vote no" id="voteNein">
+                            <img
+                                class="voteImg"
+                                src="{{ url_for('static', filename='assets/vote.nein.svg') }}"
+                                alt="Nein"
+                            />
+                        </button>
+                    </div>
+                    <div class="roomState">
+                        <div class="stateRow">Phase: <span id="phaseText">-</span></div>
+                        <div class="stateRow">Nominee: <span id="nomineeName">-</span></div>
+                        <div class="stateRow">Election Tracker: <span id="trackerCount">0</span></div>
+                        <div class="stateRow">Liberal Policies: <span id="liberalCount">0</span></div>
+                        <div class="stateRow">Fascist Policies: <span id="fascistCount">0</span></div>
+                        <div class="stateRow">Deck: <span id="deckCount">0</span> | Discard: <span id="discardCount">0</span></div>
+                        <div class="stateRow">Votes: <span id="voteStatus">0/0</span></div>
+                    </div>
+                </div>
+
+                <div class="roomCol roomRight">
+                    <div class="pileCard pileCardDraw">
+                        <img
+                            class="pileImg"
+                            src="{{ url_for('static', filename='assets/pile.draw.svg') }}"
+                            alt="Draw pile"
+                        />
+                        <div class="pileOverlay">
+                            <div class="pileStack" id="drawPileStack"></div>
+                            <div class="pileCount" id="drawPileCount">0</div>
+                        </div>
+                    </div>
+                    <div class="pileCard pileCardDiscard">
+                        <img
+                            class="pileImg"
+                            src="{{ url_for('static', filename='assets/pile.discard.svg') }}"
+                            alt="Discard pile"
+                        />
+                        <div class="pileOverlay">
+                            <div class="pileStack" id="discardPileStack"></div>
+                            <div class="pileCount" id="discardPileCount">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="roomToast" id="roomToast" aria-live="polite"></div>
+        </main>
+        <div class="modalOverlay" id="electionModal" aria-hidden="true">
+        <div class="modal electionModal" role="dialog" aria-modal="true" aria-labelledby="electionTitle">
+            <div class="modalTitle" id="electionTitle">Elect Chancellor</div>
+            <div class="roomElection">
+                <ul class="playerList roomPlayerList" id="roomPlayerList"></ul>
+                <div class="hint" id="electionHint">Only the current President can elect a chancellor.</div>
+            </div>
+            <div class="modalActions">
+            <button class="btnSmall" type="button" id="closeElection">Close</button>
+            </div>
+        </div>
+        </div>
+        <div class="modalOverlay" id="actionModal" aria-hidden="true">
+        <div class="modal actionModal" role="dialog" aria-modal="true" aria-labelledby="actionTitle">
+            <div class="modalTitle" id="actionTitle">Action</div>
+            <div class="actionBody" id="actionBody"></div>
+            <div class="modalActions" id="actionActions"></div>
+        </div>
+        </div>
+        <div class="modalOverlay endOverlay" id="endModal" aria-hidden="true">
+            <div class="endPanel" role="dialog" aria-modal="true" aria-labelledby="endTitle">
+                <div class="endHeader">
+                    <div class="endBadge" id="endBadge">Victory</div>
+                    <div class="endTitle" id="endTitle">Game Over</div>
+                    <div class="endSubtitle" id="endSubtitle">-</div>
+                </div>
+                <div class="endContent">
+                    <div class="endStats" id="endStats"></div>
+                    <div class="endRoles">
+                        <div class="endSectionTitle">Roles Revealed</div>
+                        <ul class="endRoleList" id="endRoleList"></ul>
+                    </div>
+                </div>
+                <div class="endActions">
+                    <button class="btnSmall btnSmallPrimary" type="button" id="endAcknowledge">
+                        Acknowledge &amp; Dissolve
+                    </button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+
+
+
+
