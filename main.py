@@ -147,7 +147,7 @@ def eligible_chancellors(game: dict) -> list:
     last_chancellor_id = game.get("last_chancellor_id")
     excluded = {president_id}
 
-    if len(alive) == 5:
+    if len(alive) <= 5:
         excluded.add(last_chancellor_id)
     else:
         excluded.update({last_president_id, last_chancellor_id})
@@ -159,6 +159,7 @@ def announce(game: dict, message: str) -> None:
     seq = int(game.get("announcement_seq", 0)) + 1
     game["announcement_seq"] = seq
     game["announcement"] = {"id": seq, "message": message}
+    game.setdefault("log", []).append({"id": seq, "message": message})
 
 
 def set_private_info(game: dict, pid: str, info_type: str, data: dict) -> None:
@@ -375,6 +376,8 @@ def build_player_action(game: dict, pid: str) -> dict | None:
     if phase == "executive_action" and pid == game.get("president_id"):
         action = (game.get("executive_action") or {}).get("type")
         alive = [pid2 for pid2 in alive_ids(game) if pid2 != pid]
+        if action == "investigate":
+            alive = [pid2 for pid2 in alive if pid2 not in game.get("investigated", set())]
         return {
             "type": "executive",
             "power": action,
@@ -503,12 +506,14 @@ def run_ai_turns(game: dict) -> None:
                     ensure_stats(game)["policy_peeks"] += 1
                     announce(game, "President used Policy Peek.")
                 elif action == "investigate":
+                    state["investigated"] = list(game.get("investigated", set()))
                     target_id = choose_investigation_target(
                         state, game["roles"][president_id], known_fascists_for(game, president_id)
                     )
                     if target_id:
                         party = party_for_role(game["roles"][target_id])
                         set_private_info(game, president_id, "investigation", {"target_id": target_id, "party": party})
+                        game.setdefault("investigated", set()).add(target_id)
                         ensure_stats(game)["investigations"] += 1
                         announce(game, f"President investigated {game['players'][target_id]['name']}.")
                 elif action == "special_election":
@@ -678,7 +683,9 @@ def host():
         "announcement": None,
         "stats": default_stats(),
         "end_ack": set(),
+        "investigated": set(),
         "started": False,
+        "log": [],
     }
 
     session["game_code"] = code
@@ -853,6 +860,8 @@ def api_start_game(code: str):
     game["announcement"] = None
     game["stats"] = default_stats()
     game["end_ack"] = set()
+    game["investigated"] = set()
+    game["log"] = []
     game["started"] = True
 
     return jsonify({
@@ -914,6 +923,7 @@ def api_state(code: str):
         "victory_reason": game.get("victory_reason"),
         "stats": game.get("stats", {}),
         "you_id": pid,
+        "log": game.get("log", []),
     }
 
     if game.get("winner"):
@@ -1147,8 +1157,11 @@ def api_executive(code: str):
             return jsonify({"ok": False, "message": "Target required."}), 400
         if not game["players"][target_id].get("alive", True):
             return jsonify({"ok": False, "message": "Target is not alive."}), 400
+        if target_id in game.get("investigated", set()):
+            return jsonify({"ok": False, "message": "That player has already been investigated."}), 400
         party = party_for_role(game["roles"][target_id])
         set_private_info(game, pid, "investigation", {"target_id": target_id, "party": party})
+        game.setdefault("investigated", set()).add(target_id)
         ensure_stats(game)["investigations"] += 1
         announce(game, f"President investigated {game['players'][target_id]['name']}.")
     elif action == "special_election":

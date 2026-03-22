@@ -1,3 +1,4 @@
+/* ============ LOBBY ============ */
 (() => {
     const copyBtn = document.getElementById("copyCode");
     const codeEl = document.getElementById("codeText");
@@ -51,12 +52,6 @@
         roleModal.setAttribute("aria-hidden", "false");
     };
 
-    const closeRoleModal = () => {
-        if (!roleModal) return;
-        roleModal.classList.remove("open");
-        roleModal.setAttribute("aria-hidden", "true");
-    };
-
     if (ackRoleBtn) {
         ackRoleBtn.addEventListener("click", () => {
             window.location = `/room/${code}`;
@@ -97,10 +92,10 @@
             name.textContent = p.name;
 
             if (p.id === data.host_id) {
-            const b = document.createElement("span");
-            b.className = "badge";
-            b.textContent = "HOST";
-            name.appendChild(b);
+                const b = document.createElement("span");
+                b.className = "badge";
+                b.textContent = "HOST";
+                name.appendChild(b);
             }
 
             li.appendChild(name);
@@ -142,6 +137,7 @@
     }
 })();
 
+/* ============ HOME MODALS ============ */
 (() => {
     const setupModal = ({ openBtnId, modalId, closeBtnId, focusSelector, onInput }) => {
         const openBtn = document.getElementById(openBtnId);
@@ -165,7 +161,6 @@
         openBtn.addEventListener("click", open);
         if (closeBtn) closeBtn.addEventListener("click", close);
 
-        // Click outside modal closes it
         modal.addEventListener("click", (e) => {
             if (e.target === modal) close();
         });
@@ -195,13 +190,14 @@
         focusSelector: "input[name='name']",
     });
 
-    // ESC closes open modals
     document.addEventListener("keydown", (e) => {
         if (e.key !== "Escape") return;
         if (join?.modal?.classList.contains("open")) join.close();
         if (host?.modal?.classList.contains("open")) host.close();
     });
 })();
+
+/* ============ ROOM: CARD FLIP ============ */
 (() => {
     const roomRoot = document.querySelector(".roomScreen");
     if (!roomRoot) return;
@@ -209,8 +205,8 @@
     const code = roomRoot.getAttribute("data-game-code");
     if (!code) return;
 
-    const membershipCard = roomRoot.querySelector("[data-card='membership']");
-    const roleCard = roomRoot.querySelector("[data-card='role']");
+    const membershipCard = roomRoot.querySelector(".rFlipCard[data-card='membership']");
+    const roleCard = roomRoot.querySelector(".rFlipCard[data-card='role']");
     const membershipFront = membershipCard ? membershipCard.querySelector(".flipFront") : null;
     const roleFront = roleCard ? roleCard.querySelector(".flipFront") : null;
 
@@ -255,18 +251,43 @@
         card.classList.toggle("is-flipped");
     };
 
-    if (membershipCard) {
-        membershipCard.addEventListener("click", () => {
-            handleClick(membershipCard);
-        });
-    }
-
-    if (roleCard) {
-        roleCard.addEventListener("click", () => {
-            handleClick(roleCard);
-        });
-    }
+    document.querySelectorAll(".rFlipCard").forEach((card) => {
+        card.addEventListener("click", () => handleClick(card));
+    });
 })();
+
+/* ============ AUDIO ============ */
+const SFX = (() => {
+    let ctx = null;
+    const getCtx = () => {
+        if (!ctx) {
+            try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+            catch { return null; }
+        }
+        return ctx;
+    };
+    const play = (freq, type, duration, vol = 0.15) => {
+        const c = getCtx();
+        if (!c) return;
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.value = vol;
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
+        o.connect(g).connect(c.destination);
+        o.start(); o.stop(c.currentTime + duration);
+    };
+    return {
+        notify: () => { play(880, "sine", 0.12); setTimeout(() => play(1100, "sine", 0.15), 130); },
+        vote: () => play(660, "triangle", 0.1),
+        policy: () => { play(440, "sine", 0.2); setTimeout(() => play(660, "sine", 0.25), 200); },
+        alert: () => { play(300, "sawtooth", 0.15, 0.08); setTimeout(() => play(200, "sawtooth", 0.2, 0.08), 170); },
+        win: () => { [523,659,784].forEach((f,i) => setTimeout(() => play(f, "sine", 0.3, 0.12), i*180)); },
+    };
+})();
+
+/* ============ ROOM: GAME STATE ============ */
 (() => {
     const roomRoot = document.querySelector(".roomScreen");
     if (!roomRoot) return;
@@ -274,6 +295,7 @@
     const code = roomRoot.getAttribute("data-game-code");
     if (!code) return;
 
+    // Element references
     const listEl = document.getElementById("roomPlayerList");
     const presidentEl = document.getElementById("presidentName");
     const chancellorEl = document.getElementById("chancellorName");
@@ -285,7 +307,12 @@
     const electionHint = document.getElementById("electionHint");
     const voteJaBtn = document.getElementById("voteJa");
     const voteNeinBtn = document.getElementById("voteNein");
-    const voteRow = document.querySelector(".voteRow");
+    const voteModal = document.getElementById("voteModal");
+    const voteModalNominee = document.getElementById("voteModalNominee");
+    const voteModalPresident = document.getElementById("voteModalPresident");
+    const voteModalProgress = document.getElementById("voteModalProgress");
+    const voteModalBtns = document.getElementById("voteModalBtns");
+    const voteModalWait = document.getElementById("voteModalWait");
     const phaseText = document.getElementById("phaseText");
     const nomineeName = document.getElementById("nomineeName");
     const trackerCount = document.getElementById("trackerCount");
@@ -312,6 +339,15 @@
     const endStats = document.getElementById("endStats");
     const endRoleList = document.getElementById("endRoleList");
     const endAcknowledge = document.getElementById("endAcknowledge");
+    const seatList = document.getElementById("seatList");
+    const gameLogList = document.getElementById("gameLogList");
+    const phaseBanner = document.getElementById("phaseBanner");
+    const phaseBannerText = document.getElementById("phaseBannerText");
+    const voteResultOverlay = document.getElementById("voteResultOverlay");
+    const voteResultTitle = document.getElementById("voteResultTitle");
+    const voteResultTally = document.getElementById("voteResultTally");
+    const voteResultGrid = document.getElementById("voteResultGrid");
+    const voteResultDismiss = document.getElementById("voteResultDismiss");
 
     let toastTimer = null;
     let lastAnnouncementId = null;
@@ -319,6 +355,19 @@
     let currentAction = null;
     let actionBusy = false;
     let endShown = false;
+    let lastLogCount = 0;
+    let lastVoteId = null;
+    let voteResultShown = false;
+
+    const PHASE_NAMES = {
+        nominate: "Nomination",
+        vote: "Election",
+        legislative_president: "Legislative Session",
+        legislative_chancellor: "Legislative Session",
+        veto_pending: "Veto Decision",
+        executive_action: "Executive Action",
+        game_over: "Game Over",
+    };
 
     const BOARD_SLOTS = {
         fascist: [
@@ -345,7 +394,7 @@
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(() => {
             toastEl.classList.remove("show");
-        }, 2200);
+        }, 2800);
     };
 
     const openModal = (modal) => {
@@ -376,6 +425,175 @@
         return true;
     };
 
+    // ---- Seat Board (Player List) ----
+    const renderSeatBoard = (data, byId) => {
+        if (!seatList) return;
+        seatList.innerHTML = "";
+        const order = data.order || [];
+        for (const pid of order) {
+            const player = data.players.find((p) => p.id === pid);
+            if (!player) continue;
+            const li = document.createElement("li");
+            li.className = "seatRow";
+
+            if (pid === data.you_id) li.classList.add("seatYou");
+            if (!player.alive) li.classList.add("seatDead");
+            if (pid === data.president_id || pid === data.chancellor_id) li.classList.add("seatActive");
+
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "seatName";
+            nameSpan.textContent = player.name;
+            li.appendChild(nameSpan);
+
+            if (!player.alive) {
+                const tag = document.createElement("span");
+                tag.className = "seatBadge seatBadgeDead";
+                tag.textContent = "Dead";
+                li.appendChild(tag);
+            } else {
+                if (pid === data.president_id) {
+                    const tag = document.createElement("span");
+                    tag.className = "seatBadge seatBadgePres";
+                    tag.textContent = "P";
+                    tag.title = "President";
+                    li.appendChild(tag);
+                }
+                if (pid === data.chancellor_id) {
+                    const tag = document.createElement("span");
+                    tag.className = "seatBadge seatBadgeChanc";
+                    tag.textContent = "C";
+                    tag.title = "Chancellor";
+                    li.appendChild(tag);
+                }
+                if (pid === data.nominee_id && data.phase === "vote") {
+                    const tag = document.createElement("span");
+                    tag.className = "seatBadge seatBadgeNom";
+                    tag.textContent = "N";
+                    tag.title = "Nominee";
+                    li.appendChild(tag);
+                }
+            }
+
+            seatList.appendChild(li);
+        }
+    };
+
+    // ---- Game Log ----
+    const renderGameLog = (log) => {
+        if (!gameLogList || !log) return;
+        if (log.length === lastLogCount) return;
+        lastLogCount = log.length;
+        gameLogList.innerHTML = "";
+        for (const entry of log) {
+            const li = document.createElement("li");
+            li.className = "gameLogItem";
+            li.textContent = entry.message;
+            gameLogList.appendChild(li);
+        }
+        gameLogList.scrollTop = gameLogList.scrollHeight;
+    };
+
+    // ---- Phase Banner ----
+    const renderPhaseBanner = (data, byId) => {
+        if (!phaseBanner || !phaseBannerText) return;
+        const phase = data.phase;
+        const phaseName = PHASE_NAMES[phase] || phase;
+        let text = phaseName;
+        let style = "bannerNeutral";
+
+        if (phase === "nominate") {
+            const presName = nameFor(data.president_id, byId);
+            if (data.you_id === data.president_id) {
+                text = "Your turn: Nominate a Chancellor";
+                style = "bannerFascist";
+            } else {
+                text = `${presName} is choosing a Chancellor...`;
+            }
+        } else if (phase === "vote") {
+            const nomName = nameFor(data.nominee_id, byId);
+            if (data.self && data.self.action && data.self.action.type === "vote") {
+                text = `Vote on ${nomName} for Chancellor`;
+                style = "bannerFascist";
+            } else {
+                text = `Voting on ${nomName}... (${data.vote.cast}/${data.vote.total})`;
+            }
+        } else if (phase === "legislative_president") {
+            if (data.you_id === data.president_id) {
+                text = "Your turn: Discard a policy";
+                style = "bannerFascist";
+            } else {
+                text = `${nameFor(data.president_id, byId)} is reviewing policies...`;
+            }
+        } else if (phase === "legislative_chancellor") {
+            if (data.you_id === data.chancellor_id) {
+                text = "Your turn: Enact a policy";
+                style = "bannerFascist";
+            } else {
+                text = `${nameFor(data.chancellor_id, byId)} is choosing a policy...`;
+            }
+        } else if (phase === "veto_pending") {
+            if (data.you_id === data.president_id) {
+                text = "Veto requested: Approve or Deny?";
+                style = "bannerFascist";
+            } else {
+                text = "Chancellor requested a veto...";
+            }
+        } else if (phase === "executive_action") {
+            const power = (data.executive_action || {}).type || "";
+            const powerName = power.replace(/_/g, " ");
+            if (data.you_id === data.president_id) {
+                text = `Your turn: ${powerName}`;
+                style = "bannerFascist";
+            } else {
+                text = `${nameFor(data.president_id, byId)} is using ${powerName}...`;
+            }
+        } else if (phase === "game_over") {
+            const winner = data.winner === "liberal" ? "Liberals" : "Fascists";
+            text = `${winner} Win!`;
+            style = data.winner === "liberal" ? "bannerLiberal" : "bannerFascist";
+        }
+
+        phaseBannerText.textContent = text;
+        phaseBanner.className = "rPhaseBanner " + style;
+    };
+
+    // ---- Vote Result Overlay ----
+    const showVoteResult = (data, byId) => {
+        if (!voteResultOverlay || !data.last_vote) return;
+        const lv = data.last_vote;
+        const voteId = `${lv.yes}-${lv.no}-${data.announcement?.id || 0}`;
+        if (voteId === lastVoteId) return;
+        lastVoteId = voteId;
+
+        const passed = lv.yes > lv.no;
+        if (voteResultTitle) {
+            voteResultTitle.textContent = passed ? "PASSED" : "FAILED";
+            voteResultTitle.className = "voteResultTitle " + (passed ? "passed" : "failed");
+        }
+        if (voteResultTally) {
+            voteResultTally.textContent = `${lv.yes} Ja / ${lv.no} Nein`;
+        }
+        if (voteResultGrid && lv.votes) {
+            voteResultGrid.innerHTML = "";
+            for (const [pid, vote] of Object.entries(lv.votes)) {
+                const div = document.createElement("div");
+                div.className = "voteResultEntry " + (vote ? "voteResultJa" : "voteResultNein");
+                div.textContent = `${nameFor(pid, byId)}: ${vote ? "Ja" : "Nein"}`;
+                voteResultGrid.appendChild(div);
+            }
+        }
+        voteResultOverlay.classList.add("open");
+        voteResultShown = true;
+    };
+
+    if (voteResultDismiss) {
+        voteResultDismiss.addEventListener("click", () => {
+            voteResultOverlay.classList.remove("open");
+            voteResultShown = false;
+        });
+    }
+
+    // ---- Nomination ----
     const renderNomination = (data, byId) => {
         if (!listEl) return;
         listEl.innerHTML = "";
@@ -407,13 +625,27 @@
         }
     };
 
-    const setVoteButtons = (enabled) => {
-        if (!voteRow) return;
-        voteRow.classList.toggle("hidden", !enabled);
-        if (voteJaBtn) voteJaBtn.disabled = !enabled;
-        if (voteNeinBtn) voteNeinBtn.disabled = !enabled;
+    let voteCast = false;
+
+    const showVoteModal = (data, byId) => {
+        if (!voteModal) return;
+        if (voteModalNominee) voteModalNominee.textContent = nameFor(data.nominee_id, byId);
+        if (voteModalPresident) voteModalPresident.textContent = nameFor(data.president_id, byId);
+        if (voteModalProgress && data.vote) {
+            voteModalProgress.textContent = `${data.vote.cast} / ${data.vote.total} votes cast`;
+        }
+        if (voteModalBtns) voteModalBtns.classList.toggle("hidden", voteCast);
+        if (voteModalWait) voteModalWait.classList.toggle("hidden", !voteCast);
+        voteModal.classList.add("open");
     };
 
+    const hideVoteModal = () => {
+        if (!voteModal) return;
+        voteModal.classList.remove("open");
+        voteCast = false;
+    };
+
+    // ---- Policy Rendering ----
     const renderPolicyChoices = (policies, onSelect) => {
         if (!actionBody) return;
         actionBody.innerHTML = "";
@@ -504,11 +736,12 @@
         }
     };
 
+    // ---- End Dashboard ----
     const renderEndDashboard = (data) => {
         if (!endModal || !endTitle || !endSubtitle || !endStats || !endRoleList) return;
         closeModal(actionModal);
         closeModal(electionModal);
-        setVoteButtons(false);
+        hideVoteModal();
         const winner = data.winner || "unknown";
         const winnerLabel = winner === "liberal" ? "Liberals" : "Fascists";
         const reasonMap = {
@@ -590,6 +823,7 @@
 
         openModal(endModal);
         endShown = true;
+        SFX.win();
     };
 
     const dissolveRoom = () => {
@@ -615,6 +849,7 @@
         });
     }
 
+    // ---- Action Modal ----
     const renderActionModal = (data, byId) => {
         if (!actionModal || !actionTitle || !actionBody || !actionActions) return;
         actionBody.innerHTML = "";
@@ -627,7 +862,7 @@
         }
 
         if (action.type === "president_discard") {
-            actionTitle.textContent = "Discard a Policy";
+            actionTitle.textContent = "President: Discard a Policy";
             renderPolicyChoices(action.policies, async (idx) => {
                 if (actionBusy) return;
                 actionBusy = true;
@@ -635,7 +870,7 @@
                 actionBusy = false;
             });
         } else if (action.type === "chancellor_enact") {
-            actionTitle.textContent = "Enact a Policy";
+            actionTitle.textContent = "Chancellor: Enact a Policy";
             renderPolicyChoices(action.policies, async (idx) => {
                 if (actionBusy) return;
                 actionBusy = true;
@@ -645,7 +880,7 @@
             if (action.veto_available && action.veto_allowed) {
                 const vetoBtn = document.createElement("button");
                 vetoBtn.type = "button";
-                vetoBtn.className = "btnSmall";
+                vetoBtn.className = "btnSmall btnVeto";
                 vetoBtn.textContent = "Request Veto";
                 vetoBtn.addEventListener("click", async () => {
                     if (actionBusy) return;
@@ -657,6 +892,11 @@
             }
         } else if (action.type === "veto_decision") {
             actionTitle.textContent = "Veto Request";
+            const hint = document.createElement("div");
+            hint.className = "actionHint";
+            hint.textContent = "The Chancellor has requested to veto this agenda.";
+            actionBody.appendChild(hint);
+
             const approveBtn = document.createElement("button");
             approveBtn.type = "button";
             approveBtn.className = "btnSmall btnSmallPrimary";
@@ -681,9 +921,19 @@
             actionActions.appendChild(denyBtn);
         } else if (action.type === "executive") {
             const power = action.power || "executive";
-            actionTitle.textContent = power.replace("_", " ").toUpperCase();
+            const powerNames = {
+                policy_peek: "Policy Peek",
+                investigate: "Investigate Loyalty",
+                special_election: "Special Election",
+                execution: "Execution",
+            };
+            actionTitle.textContent = powerNames[power] || power.replace(/_/g, " ").toUpperCase();
             const targets = action.targets || [];
             if (power === "policy_peek") {
+                const hint = document.createElement("div");
+                hint.className = "actionHint";
+                hint.textContent = "View the top 3 policies in the draw pile.";
+                actionBody.appendChild(hint);
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.className = "btnSmall btnSmallPrimary";
@@ -696,6 +946,17 @@
                 });
                 actionActions.appendChild(btn);
             } else {
+                const hint = document.createElement("div");
+                hint.className = "actionHint";
+                if (power === "investigate") {
+                    hint.textContent = "Choose a player to investigate their party membership.";
+                } else if (power === "special_election") {
+                    hint.textContent = "Choose the next Presidential candidate.";
+                } else if (power === "execution") {
+                    hint.textContent = "Choose a player to execute.";
+                }
+                actionBody.appendChild(hint);
+
                 const list = document.createElement("ul");
                 list.className = "actionList";
                 const label = power === "execution"
@@ -735,17 +996,21 @@
         if (info.id === lastPrivateId) return;
         lastPrivateId = info.id;
 
-        actionTitle.textContent = "Private Info";
+        actionTitle.textContent = "Private Information";
         actionBody.innerHTML = "";
         actionActions.innerHTML = "";
 
         const msg = document.createElement("div");
+        msg.className = "actionHint";
         if (info.type === "policy_peek") {
-            msg.textContent = "Top 3 policies:";
+            msg.textContent = "Top 3 policies in the draw pile:";
             actionBody.appendChild(msg);
             renderPolicyChoices(info.data.policies || [], () => {});
         } else if (info.type === "investigation") {
-            msg.textContent = `Investigation result: ${info.data.party.toUpperCase()}`;
+            const party = (info.data.party || "").toUpperCase();
+            msg.textContent = `Investigation result: ${party}`;
+            msg.style.fontSize = "18px";
+            msg.style.color = info.data.party === "fascist" ? "#f26a50" : "#65b3bf";
             actionBody.appendChild(msg);
         }
 
@@ -769,7 +1034,12 @@
             if (!currentAction || currentAction.type !== "vote") return;
             if (actionBusy) return;
             actionBusy = true;
-            await postJson(`/api/game/${code}/vote`, { vote: "ja" });
+            const ok = await postJson(`/api/game/${code}/vote`, { vote: "ja" });
+            if (ok) {
+                voteCast = true;
+                if (voteModalBtns) voteModalBtns.classList.add("hidden");
+                if (voteModalWait) voteModalWait.classList.remove("hidden");
+            }
             actionBusy = false;
         });
     }
@@ -779,11 +1049,17 @@
             if (!currentAction || currentAction.type !== "vote") return;
             if (actionBusy) return;
             actionBusy = true;
-            await postJson(`/api/game/${code}/vote`, { vote: "nein" });
+            const ok = await postJson(`/api/game/${code}/vote`, { vote: "nein" });
+            if (ok) {
+                voteCast = true;
+                if (voteModalBtns) voteModalBtns.classList.add("hidden");
+                if (voteModalWait) voteModalWait.classList.remove("hidden");
+            }
             actionBusy = false;
         });
     }
 
+    // ---- Main Render ----
     const renderState = (data) => {
         const byId = new Map(data.players.map((p) => [p.id, p.name]));
 
@@ -791,14 +1067,7 @@
         if (chancellorEl) chancellorEl.textContent = nameFor(data.chancellor_id, byId);
         if (lastPresidentEl) lastPresidentEl.textContent = nameFor(data.last_president_id, byId);
         if (lastChancellorEl) lastChancellorEl.textContent = nameFor(data.last_chancellor_id, byId);
-        console.log("Presidency", {
-            president_id: data.president_id,
-            president_name: nameFor(data.president_id, byId),
-            chancellor_id: data.chancellor_id,
-            chancellor_name: nameFor(data.chancellor_id, byId),
-            order: data.order,
-        });
-        if (phaseText) phaseText.textContent = data.phase || "-";
+        if (phaseText) phaseText.textContent = PHASE_NAMES[data.phase] || data.phase || "-";
         setPlaque(data.phase);
         if (nomineeName) nomineeName.textContent = nameFor(data.nominee_id, byId);
         if (trackerCount) trackerCount.textContent = data.election_tracker ?? 0;
@@ -808,10 +1077,6 @@
         if (discardCount) discardCount.textContent = data.policy_discard_count ?? 0;
         renderPolicyTrack(fascistPolicyRow, data.fascist_policies ?? 0);
         renderPolicyTrack(liberalPolicyRow, data.liberal_policies ?? 0);
-        renderPileStack(drawPileStack, data.policy_deck_count ?? 0);
-        renderPileStack(discardPileStack, data.policy_discard_count ?? 0);
-        if (drawPileCount) drawPileCount.textContent = data.policy_deck_count ?? 0;
-        if (discardPileCount) discardPileCount.textContent = data.policy_discard_count ?? 0;
         if (voteStatus) {
             if (data.phase === "vote") {
                 voteStatus.textContent = `${data.vote.cast}/${data.vote.total}`;
@@ -822,10 +1087,28 @@
             }
         }
 
+        // Seat board + game log + phase banner
+        renderSeatBoard(data, byId);
+        renderGameLog(data.log);
+        renderPhaseBanner(data, byId);
+
         if (data.announcement && data.announcement.message) {
             if (data.announcement.id !== lastAnnouncementId) {
                 lastAnnouncementId = data.announcement.id;
-                showToast(data.announcement.message);
+                const msg = data.announcement.message;
+                showToast(msg);
+
+                // Sound effects based on event type
+                if (msg.includes("Policy was enacted")) SFX.policy();
+                else if (msg.includes("Election passed") || msg.includes("Election failed")) SFX.vote();
+                else if (msg.includes("executed") || msg.includes("win")) SFX.alert();
+                else SFX.notify();
+
+                // Show vote result overlay when election resolves
+                if (data.last_vote && data.last_vote.votes &&
+                    (msg.includes("Election passed") || msg.includes("Election failed"))) {
+                    showVoteResult(data, byId);
+                }
             }
         }
 
@@ -834,7 +1117,13 @@
             return;
         }
 
+        const prevAction = currentAction;
         currentAction = data.self ? data.self.action : null;
+
+        // Play notification when it becomes your turn
+        if (currentAction && (!prevAction || prevAction.type !== currentAction.type)) {
+            SFX.notify();
+        }
 
         if (currentAction && currentAction.type === "nominate") {
             openModal(electionModal);
@@ -843,7 +1132,24 @@
             closeModal(electionModal);
         }
 
-        setVoteButtons(currentAction && currentAction.type === "vote");
+        if (currentAction && currentAction.type === "vote") {
+            showVoteModal(data, byId);
+        } else if (data.phase === "vote") {
+            // Show vote modal with progress even after casting vote
+            if (voteModal) {
+                if (voteModalNominee) voteModalNominee.textContent = nameFor(data.nominee_id, byId);
+                if (voteModalPresident) voteModalPresident.textContent = nameFor(data.president_id, byId);
+                if (voteModalProgress && data.vote) {
+                    voteModalProgress.textContent = `${data.vote.cast} / ${data.vote.total} votes cast`;
+                }
+                if (voteModalBtns) voteModalBtns.classList.add("hidden");
+                if (voteModalWait) voteModalWait.classList.remove("hidden");
+                voteModal.classList.add("open");
+            }
+        } else {
+            hideVoteModal();
+        }
+
         if (currentAction && currentAction.type !== "nominate" && currentAction.type !== "vote") {
             renderActionModal(data, byId);
         } else {
@@ -873,5 +1179,5 @@
     };
 
     refresh();
-    setInterval(refresh, 2000);
+    setInterval(refresh, 1500);
 })();

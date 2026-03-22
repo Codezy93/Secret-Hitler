@@ -15,201 +15,169 @@
     </head>
     <body>
         <main class="screen roomScreen" data-game-code="{{ game.code }}">
-            <header class="roomTop">
-                <img
-                    class="roomLogo"
-                    src="{{ url_for('static', filename='assets/logo.svg') }}"
-                    alt="Secret Hitler"
-                />
-                <div class="roomTitleWrap">
-                    <img
-                        class="roomTitle"
-                        id="roomPlaque"
+            <!-- ===== COMPACT HEADER ===== -->
+            <header class="rHeader">
+                <img class="rHeaderLogo" src="{{ url_for('static', filename='assets/logo.svg') }}" alt="Secret Hitler" />
+                <div class="rHeaderCenter">
+                    <img class="rHeaderPlaque" id="roomPlaque"
                         src="{{ url_for('static', filename='assets/plaque.president.svg') }}"
                         data-president="{{ url_for('static', filename='assets/plaque.president.svg') }}"
                         data-chancellor="{{ url_for('static', filename='assets/plaque.chancellor.svg') }}"
                         data-citizen="{{ url_for('static', filename='assets/plaque.citizen.svg') }}"
-                        alt="President"
-                    />
-                    <div class="roomStatus roomStatusInline">
-                        <div class="statusRow">
-                            <div class="statusItem">President: <span id="presidentName">-</span></div>
-                            <div class="statusItem">Chancellor: <span id="chancellorName">-</span></div>
-                        </div>
-                        <div class="statusRow">
-                            <div class="statusItem">Last President: <span id="lastPresidentName">-</span></div>
-                            <div class="statusItem">Last Chancellor: <span id="lastChancellorName">-</span></div>
-                        </div>
+                        alt="President" />
+                    <div class="rHeaderGov">
+                        <span>Pres: <b id="presidentName">-</b></span>
+                        <span>Chanc: <b id="chancellorName">-</b></span>
                     </div>
                 </div>
-                <div class="roomTopRight">
-                    <div class="roomCode">
-                        <span class="codePill" id="codeText">{{ game.code }}</span>
-                    </div>
+                <div class="rHeaderRight">
+                    <span class="rHeaderCode" id="codeText">{{ game.code }}</span>
                     <form method="post" action="{{ url_for('leave') }}">
-                        <button class="roomLeave" type="submit">LEAVE</button>
+                        <button class="rHeaderLeave" type="submit">LEAVE</button>
                     </form>
                 </div>
             </header>
 
-            <section class="roomGrid">
-                <div class="roomCol roomLeft">
-                    <div class="cardStack">
-                        <button
-                            class="flipCard"
-                            type="button"
-                            data-card="membership"
+            <!-- ===== MAIN 3-COL LAYOUT ===== -->
+            <section class="rBody">
+                <!-- LEFT: Players + Cards -->
+                <div class="rLeft">
+                    <div class="rPanel rPlayersPanel">
+                        <div class="rPanelTitle">Players</div>
+                        <ul class="rPlayerList" id="seatList"></ul>
+                    </div>
+                    <div class="rCardsRow">
+                        <button class="rFlipCard" type="button" data-card="membership"
                             data-front-liberal="{{ url_for('static', filename='assets/membership.liberal.svg') }}"
                             data-front-fascist="{{ url_for('static', filename='assets/membership.fascist.svg') }}"
-                            aria-label="Reveal party membership"
-                        >
+                            aria-label="Reveal party membership">
                             <span class="flipInner">
-                                <img
-                                    class="cardImg flipFace flipBack"
-                                    src="{{ url_for('static', filename='assets/membership.back.svg') }}"
-                                    alt="Party membership card back"
-                                />
-                                <img
-                                    class="cardImg flipFace flipFront"
-                                    src="{{ url_for('static', filename='assets/membership.back.svg') }}"
-                                    alt="Party membership card"
-                                />
+                                <img class="rCardImg flipFace flipBack" src="{{ url_for('static', filename='assets/membership.back.svg') }}" alt="Membership" />
+                                <img class="rCardImg flipFace flipFront" src="{{ url_for('static', filename='assets/membership.back.svg') }}" alt="Membership" />
                             </span>
                         </button>
-                    </div>
-                    <div class="cardStack">
-                        <button
-                            class="flipCard"
-                            type="button"
-                            data-card="role"
+                        <button class="rFlipCard" type="button" data-card="role"
                             data-front-liberal="{{ url_for('static', filename='assets/role.liberal.svg') }}"
                             data-front-fascist="{{ url_for('static', filename='assets/role.fascist.svg') }}"
                             data-front-hitler="{{ url_for('static', filename='assets/role.hitler.svg') }}"
-                            aria-label="Reveal your role"
-                        >
+                            aria-label="Reveal role">
                             <span class="flipInner">
-                                <img
-                                    class="cardImg flipFace flipBack"
-                                    src="{{ url_for('static', filename='assets/role.back.svg') }}"
-                                    alt="Role card back"
-                                />
-                                <img
-                                    class="cardImg flipFace flipFront"
-                                    src="{{ url_for('static', filename='assets/role.back.svg') }}"
-                                    alt="Role card"
-                                />
+                                <img class="rCardImg flipFace flipBack" src="{{ url_for('static', filename='assets/role.back.svg') }}" alt="Role" />
+                                <img class="rCardImg flipFace flipFront" src="{{ url_for('static', filename='assets/role.back.svg') }}" alt="Role" />
                             </span>
                         </button>
                     </div>
-
                 </div>
 
-                <div class="roomCenter">
-                    <div class="boardStack">
-                        <div class="boardWrap">
-                            <img
-                                class="boardImg"
-                                src="{{ url_for('static', filename='assets/board.fascist.svg') }}"
-                                alt="Fascist board"
-                            />
-                            <div class="boardOverlay">
-                                <div
-                                    class="boardPolicyRow boardPolicyRowFascist"
-                                    id="fascistPolicyRow"
-                                    data-max="6"
-                                    data-policy="fascist"
-                                ></div>
-                            </div>
-                        </div>
-                        <div class="boardWrap">
-                            <img
-                                class="boardImg"
-                                src="{{ url_for('static', filename='assets/board.liberal.svg') }}"
-                                alt="Liberal board"
-                            />
-                            <div class="boardOverlay">
-                                <div
-                                    class="boardPolicyRow boardPolicyRowLiberal"
-                                    id="liberalPolicyRow"
-                                    data-max="5"
-                                    data-policy="liberal"
-                                ></div>
-                            </div>
+                <!-- CENTER: Boards + Phase Banner + Stats -->
+                <div class="rCenter">
+                    <div class="rBoardWrap">
+                        <img class="rBoardImg" src="{{ url_for('static', filename='assets/board.fascist.svg') }}" alt="Fascist board" />
+                        <div class="boardOverlay">
+                            <div class="boardPolicyRow boardPolicyRowFascist" id="fascistPolicyRow" data-max="6" data-policy="fascist"></div>
                         </div>
                     </div>
-                    <div class="voteRow hidden">
-                        <button class="voteBtn" type="button" aria-label="Vote yes" id="voteJa">
-                            <img
-                                class="voteImg"
-                                src="{{ url_for('static', filename='assets/vote.ja.svg') }}"
-                                alt="Ja"
-                            />
-                        </button>
-                        <button class="voteBtn" type="button" aria-label="Vote no" id="voteNein">
-                            <img
-                                class="voteImg"
-                                src="{{ url_for('static', filename='assets/vote.nein.svg') }}"
-                                alt="Nein"
-                            />
-                        </button>
+                    <div class="rBoardWrap">
+                        <img class="rBoardImg" src="{{ url_for('static', filename='assets/board.liberal.svg') }}" alt="Liberal board" />
+                        <div class="boardOverlay">
+                            <div class="boardPolicyRow boardPolicyRowLiberal" id="liberalPolicyRow" data-max="5" data-policy="liberal"></div>
+                        </div>
                     </div>
-                    <div class="roomState">
-                        <div class="stateRow">Phase: <span id="phaseText">-</span></div>
-                        <div class="stateRow">Nominee: <span id="nomineeName">-</span></div>
-                        <div class="stateRow">Election Tracker: <span id="trackerCount">0</span></div>
-                        <div class="stateRow">Liberal Policies: <span id="liberalCount">0</span></div>
-                        <div class="stateRow">Fascist Policies: <span id="fascistCount">0</span></div>
-                        <div class="stateRow">Deck: <span id="deckCount">0</span> | Discard: <span id="discardCount">0</span></div>
-                        <div class="stateRow">Votes: <span id="voteStatus">0/0</span></div>
+                    <div class="rPhaseBanner" id="phaseBanner">
+                        <span id="phaseBannerText">Waiting...</span>
+                    </div>
+                    <div class="rStats">
+                        <span>Tracker: <b id="trackerCount">0</b>/3</span>
+                        <span>Deck: <b id="deckCount">0</b></span>
+                        <span>Discard: <b id="discardCount">0</b></span>
+                        <span>Lib: <b id="liberalCount">0</b></span>
+                        <span>Fas: <b id="fascistCount">0</b></span>
                     </div>
                 </div>
 
-                <div class="roomCol roomRight">
-                    <div class="pileCard pileCardDraw">
-                        <img
-                            class="pileImg"
-                            src="{{ url_for('static', filename='assets/pile.draw.svg') }}"
-                            alt="Draw pile"
-                        />
-                        <div class="pileOverlay">
-                            <div class="pileStack" id="drawPileStack"></div>
-                            <div class="pileCount" id="drawPileCount">0</div>
-                        </div>
-                    </div>
-                    <div class="pileCard pileCardDiscard">
-                        <img
-                            class="pileImg"
-                            src="{{ url_for('static', filename='assets/pile.discard.svg') }}"
-                            alt="Discard pile"
-                        />
-                        <div class="pileOverlay">
-                            <div class="pileStack" id="discardPileStack"></div>
-                            <div class="pileCount" id="discardPileCount">0</div>
-                        </div>
+                <!-- RIGHT: Game Log -->
+                <div class="rRight">
+                    <div class="rPanel rLogPanel">
+                        <div class="rPanelTitle">Game Log</div>
+                        <ul class="rLogList" id="gameLogList"></ul>
                     </div>
                 </div>
             </section>
+
+            <!-- Hidden state elements (used by JS) -->
+            <span id="lastPresidentName" class="hidden"></span>
+            <span id="lastChancellorName" class="hidden"></span>
+            <span id="phaseText" class="hidden"></span>
+            <span id="nomineeName" class="hidden"></span>
+            <span id="voteStatus" class="hidden"></span>
+            <span id="drawPileCount" class="hidden"></span>
+            <span id="discardPileCount" class="hidden"></span>
+            <span id="drawPileStack" class="hidden"></span>
+            <span id="discardPileStack" class="hidden"></span>
+
             <div class="roomToast" id="roomToast" aria-live="polite"></div>
         </main>
+
+        <!-- ===== VOTE MODAL ===== -->
+        <div class="voteModal" id="voteModal" aria-hidden="true">
+            <div class="voteModalPanel">
+                <div class="voteModalTitle">ELECTION</div>
+                <div class="voteModalNominee">
+                    <span class="voteModalLabel">Chancellor Nominee</span>
+                    <span class="voteModalName" id="voteModalNominee">-</span>
+                </div>
+                <div class="voteModalPres">
+                    Nominated by President <b id="voteModalPresident">-</b>
+                </div>
+                <div class="voteModalProgress" id="voteModalProgress">0 / 0 votes cast</div>
+                <div class="voteModalBtns" id="voteModalBtns">
+                    <button class="voteModalBtn voteModalJa" type="button" id="voteJa">
+                        <img src="{{ url_for('static', filename='assets/vote.ja.svg') }}" alt="Ja" />
+                        <span>JA!</span>
+                    </button>
+                    <button class="voteModalBtn voteModalNein" type="button" id="voteNein">
+                        <img src="{{ url_for('static', filename='assets/vote.nein.svg') }}" alt="Nein" />
+                        <span>NEIN</span>
+                    </button>
+                </div>
+                <div class="voteModalWait hidden" id="voteModalWait">Vote cast. Waiting for others...</div>
+            </div>
+        </div>
+
+        <!-- ===== VOTE RESULT OVERLAY ===== -->
+        <div class="voteResultOverlay" id="voteResultOverlay">
+            <div class="voteResultPanel" id="voteResultPanel">
+                <div class="voteResultTitle" id="voteResultTitle">ELECTION</div>
+                <div class="voteResultTally" id="voteResultTally">0 Ja / 0 Nein</div>
+                <div class="voteResultGrid" id="voteResultGrid"></div>
+                <button class="btnSmall btnSmallPrimary" type="button" id="voteResultDismiss">OK</button>
+            </div>
+        </div>
+
+        <!-- ===== ELECTION MODAL ===== -->
         <div class="modalOverlay" id="electionModal" aria-hidden="true">
-        <div class="modal electionModal" role="dialog" aria-modal="true" aria-labelledby="electionTitle">
-            <div class="modalTitle" id="electionTitle">Elect Chancellor</div>
-            <div class="roomElection">
-                <ul class="playerList roomPlayerList" id="roomPlayerList"></ul>
-                <div class="hint" id="electionHint">Only the current President can elect a chancellor.</div>
-            </div>
-            <div class="modalActions">
-            <button class="btnSmall" type="button" id="closeElection">Close</button>
+            <div class="modal electionModal" role="dialog" aria-modal="true" aria-labelledby="electionTitle">
+                <div class="modalTitle" id="electionTitle">Nominate Chancellor</div>
+                <div class="roomElection">
+                    <ul class="playerList roomPlayerList" id="roomPlayerList"></ul>
+                    <div class="hint" id="electionHint">Choose an eligible Chancellor.</div>
+                </div>
+                <div class="modalActions">
+                    <button class="btnSmall" type="button" id="closeElection">Close</button>
+                </div>
             </div>
         </div>
-        </div>
+
+        <!-- ===== ACTION MODAL ===== -->
         <div class="modalOverlay" id="actionModal" aria-hidden="true">
-        <div class="modal actionModal" role="dialog" aria-modal="true" aria-labelledby="actionTitle">
-            <div class="modalTitle" id="actionTitle">Action</div>
-            <div class="actionBody" id="actionBody"></div>
-            <div class="modalActions" id="actionActions"></div>
+            <div class="modal actionModal" role="dialog" aria-modal="true" aria-labelledby="actionTitle">
+                <div class="modalTitle" id="actionTitle">Action</div>
+                <div class="actionBody" id="actionBody"></div>
+                <div class="modalActions" id="actionActions"></div>
+            </div>
         </div>
-        </div>
+
+        <!-- ===== END SCREEN ===== -->
         <div class="modalOverlay endOverlay" id="endModal" aria-hidden="true">
             <div class="endPanel" role="dialog" aria-modal="true" aria-labelledby="endTitle">
                 <div class="endHeader">
@@ -233,8 +201,3 @@
         </div>
     </body>
 </html>
-
-
-
-
-

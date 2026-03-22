@@ -326,190 +326,218 @@ body{
 
 /* ============ Room ============ */
 .roomScreen{
-  padding: 14px 16px 18px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
 }
 
-.roomTop{
+/* --- Compact Header --- */
+.rHeader{
   position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(140px, 200px) 1fr minmax(160px, 200px);
+  z-index: 2;
+  display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
+  padding: 6px 12px;
+  background: rgba(0,0,0,0.12);
 }
 
-.roomLogo{
-  width: min(170px, 24vw);
-  height: auto;
-  filter: drop-shadow(10px 10px 0 rgba(0,0,0,0.3));
+.rHeaderLogo{
+  height: 32px;
+  width: auto;
+  filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.2));
+  flex-shrink: 0;
 }
 
-.roomTitle{
-  justify-self: center;
-  width: min(320px, 42vw);
-  height: auto;
-  filter: drop-shadow(6px 6px 0 rgba(0,0,0,0.2));
+.rHeaderCenter{
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.roomTopRight{
-  justify-self: end;
-  display: grid;
+.rHeaderPlaque{
+  height: 28px;
+  width: auto;
+}
+
+.rHeaderGov{
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.85);
+}
+
+.rHeaderGov b{
+  color: #fff;
+}
+
+.rHeaderRight{
+  display: flex;
+  align-items: center;
   gap: 8px;
-  justify-items: end;
+  flex-shrink: 0;
 }
 
-.roomCode{
-  background: #3b3b3b;
-  color: #fff;
-  border-radius: 18px;
-  padding: 6px 16px;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-}
-
-.roomCode .codePill{
-  background: transparent;
-  color: #fff;
-  padding: 0;
+.rHeaderCode{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.25);
+  padding: 3px 8px;
+  border-radius: 8px;
   letter-spacing: 1px;
-  font-size: 18px;
 }
 
-.roomLeave{
+.rHeaderLeave{
   border: 0;
-  border-radius: 18px;
-  background: #3b3b3b;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.35);
   color: #fff;
-  padding: 6px 18px;
-  font-size: 18px;
-  letter-spacing: 2px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
   cursor: pointer;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.25);
 }
 
-.roomGrid{
+.rHeaderLeave:hover{
+  background: rgba(0,0,0,0.5);
+}
+
+/* --- 3-Column Body --- */
+.rBody{
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(190px, 220px) minmax(360px, 1fr) minmax(190px, 220px);
-  column-gap: 20px;
-  row-gap: 16px;
-  align-items: start;
+  grid-template-columns: 180px 1fr 200px;
+  gap: 8px;
+  padding: 6px 8px;
+  overflow: hidden;
+  min-height: 0;
 }
 
-.roomCol{
-  display: grid;
-  gap: 16px;
-  align-content: start;
-  justify-items: center;
-  padding-top: 6px;
+/* --- Left Panel --- */
+.rLeft{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.cardStack,
-.pileCard{
-  position: relative;
-  border-radius: 14px;
-  padding: 14px;
-  width: min(200px, 92%);
-  box-shadow: 0 8px 0 rgba(0,0,0,0.22);
-  border: 3px solid rgba(0,0,0,0.18);
-}
-
-.roomLeft .cardStack{
-  background: #f2cf6a;
-}
-
-.roomLeft .cardStack:last-child{
-  background: #f4f0d8;
-}
-
-.roomRight .pileCard{
-  background: #efe6c8;
-}
-
-.cardImg,
-.pileImg{
-  width: 100%;
-  height: auto;
+.rPanel{
+  background: rgba(255,255,255,0.7);
   border-radius: 10px;
-  background: transparent;
-  object-fit: contain;
-  display: block;
-  max-height: 220px;
+  padding: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
-.pileOverlay{
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
+.rPanelTitle{
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(0,0,0,0.5);
+  margin-bottom: 6px;
 }
 
-.pileStack{
-  position: relative;
-  width: 70%;
-  height: 70%;
+.rPlayersPanel{
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.pileStackCard{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 70%;
-  height: auto;
-  transform: translate(-50%, -50%) translate(var(--stack-x, 0px), var(--stack-y, 0px))
-    rotate(var(--stack-rotate, 0deg));
-  filter: drop-shadow(0 4px 0 rgba(0,0,0,0.18));
-}
-
-.pileCount{
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  min-width: 24px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.roomCenter{
-  display: grid;
-  align-content: start;
-  justify-items: center;
-  gap: 14px;
-}
-
-.boardStack{
-  display: grid;
-  gap: 16px;
-  background: transparent;
+.rPlayerList{
+  list-style: none;
   padding: 0;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
 }
 
-.boardImg{
+/* --- Cards Row --- */
+.rCardsRow{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.rFlipCard{
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  perspective: 900px;
+}
+
+.rFlipCard .flipInner{
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform .6s ease;
+}
+
+.rFlipCard .flipFace{
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+}
+
+.rFlipCard .flipFront{
+  transform: rotateY(180deg);
+}
+
+.rFlipCard.is-flipped .flipInner{
+  transform: rotateY(180deg);
+}
+
+.rFlipCard:focus-visible{
+  outline: 3px solid rgba(0,0,0,0.5);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.rCardImg{
   width: 100%;
   height: auto;
-  border-radius: 12px;
-  background: transparent;
-  max-height: 210px;
-  object-fit: contain;
-  box-shadow: none;
+  display: block;
+  border-radius: 6px;
 }
 
-.boardWrap{
+/* --- Center Column --- */
+.rCenter{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rBoardWrap{
   position: relative;
   width: 100%;
+  max-width: 560px;
+  flex-shrink: 1;
+}
+
+.rBoardImg{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  object-fit: contain;
 }
 
 .boardOverlay{
@@ -537,7 +565,7 @@ body{
   left: var(--slot-x, 50%);
   top: var(--slot-y, var(--slot-default-y, 50%));
   transform: translate(-50%, -50%);
-  width: clamp(28px, 6vw, 72px);
+  width: clamp(22px, 5vw, 56px);
   height: auto;
   display: grid;
   place-items: center;
@@ -546,57 +574,116 @@ body{
 .boardPolicyCard{
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 3px 0 rgba(0,0,0,0.18));
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.18));
+  animation: policyDrop 0.4s ease;
 }
 
-.voteRow{
-  justify-self: center;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  width: min(320px, 92%);
+@keyframes policyDrop{
+  from{ opacity: 0; transform: translateY(-8px) scale(0.8); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.voteRow.hidden{
-  opacity: 0.3;
-  pointer-events: none;
+/* --- Phase Banner --- */
+.rPhaseBanner{
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(31,31,31,0.9), rgba(63,63,63,0.9));
+  color: #fff;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+  animation: bannerPulse 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
-.roomState{
-  width: min(520px, 94%);
-  background: rgba(255,255,255,0.6);
-  border-radius: 14px;
-  padding: 10px 12px;
-  border: 2px solid rgba(0,0,0,0.12);
-  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
-  display: grid;
-  gap: 6px;
-}
-
-.stateRow{
+.rPhaseBanner span{
   font-size: 13px;
   font-weight: 900;
-  color: rgba(0,0,0,0.75);
+  letter-spacing: 1px;
 }
 
+@keyframes bannerPulse{
+  0%, 100%{ box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+  50%{ box-shadow: 0 4px 10px rgba(242,106,80,0.3); }
+}
+
+.rPhaseBanner.bannerLiberal{
+  background: linear-gradient(135deg, rgba(101,179,191,0.9), rgba(80,150,165,0.9));
+}
+
+.rPhaseBanner.bannerFascist{
+  background: linear-gradient(135deg, rgba(242,106,80,0.9), rgba(200,80,60,0.9));
+}
+
+.rPhaseBanner.bannerNeutral{
+  background: linear-gradient(135deg, rgba(31,31,31,0.9), rgba(63,63,63,0.9));
+}
+
+/* --- Stats Row --- */
+.rStats{
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.75);
+  flex-shrink: 0;
+}
+
+.rStats b{
+  color: #fff;
+}
+
+/* --- Right Panel (Game Log) --- */
+.rRight{
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rLogPanel{
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rLogList{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+}
+
+
+
+/* ============ Toast ============ */
 .roomToast{
   position: absolute;
   left: 50%;
-  top: 16px;
+  top: 42px;
   transform: translate(-50%, 8px);
   background: rgba(40,40,40,0.95);
   color: #fff;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.5px;
   opacity: 0;
   pointer-events: none;
   transition: opacity .2s ease, transform .2s ease;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
   z-index: 5;
+  max-width: min(500px, 90vw);
+  text-align: center;
 }
 
 .roomToast.show{
@@ -604,37 +691,300 @@ body{
   transform: translate(-50%, 0);
 }
 
-
-.roomStatus{
-  width: min(520px, 94%);
-  background: rgba(255,255,255,0.65);
-  border-radius: 14px;
-  padding: 10px 12px;
-  display: grid;
+/* ============ Seat Board (Player List) ============ */
+.seatRow{
+  display: flex;
+  align-items: center;
   gap: 6px;
-  box-shadow: 0 6px 0 rgba(0,0,0,0.18);
-  border: 2px solid rgba(0,0,0,0.12);
+  padding: 4px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(0,0,0,0.04);
+  transition: background .2s ease, opacity .2s ease;
 }
 
-.statusRow{
+.seatRow.seatYou{
+  background: rgba(242,106,80,0.15);
+  border: 1px solid rgba(242,106,80,0.3);
+}
+
+.seatRow.seatDead{
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.seatRow.seatActive{
+  background: rgba(101,179,191,0.2);
+  border: 1px solid rgba(101,179,191,0.4);
+}
+
+.seatBadge{
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.seatBadgePres{ background: rgba(31,31,31,0.85); color: #fff; }
+.seatBadgeChanc{ background: rgba(242,106,80,0.8); color: #fff; }
+.seatBadgeNom{ background: rgba(101,179,191,0.7); color: #fff; }
+.seatBadgeDead{ background: rgba(0,0,0,0.25); color: rgba(0,0,0,0.6); }
+
+.seatName{
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============ Game Log Items ============ */
+.gameLogItem{
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.65);
+  padding: 3px 5px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.04);
+  line-height: 1.3;
+  animation: logSlideIn 0.3s ease;
+}
+
+.gameLogItem:last-child{
+  background: rgba(242,106,80,0.1);
+  color: rgba(0,0,0,0.8);
+}
+
+@keyframes logSlideIn{
+  from{ opacity: 0; transform: translateY(-4px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+/* ============ Vote Modal ============ */
+.voteModal{
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0,0,0,0.55);
+  place-items: center;
+}
+
+.voteModal.open{
+  display: grid;
+}
+
+.voteModalPanel{
+  background: #15120f;
+  color: #f7efe5;
+  border-radius: 18px;
+  padding: 24px 32px;
+  border: 2px solid rgba(255,214,150,0.3);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  text-align: center;
+  min-width: 320px;
+  max-width: 420px;
+  animation: voteModalIn 0.3s ease;
+}
+
+@keyframes voteModalIn{
+  from{ opacity: 0; transform: scale(0.9) translateY(10px); }
+  to{ opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.voteModalTitle{
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  color: rgba(255,214,150,0.9);
+}
+
+.voteModalLabel{
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.voteModalName{
+  font-size: 26px;
+  font-weight: 900;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.voteModalPres{
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 14px;
+}
+
+.voteModalProgress{
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 16px;
+}
+
+.voteModalBtns{
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 14px;
 }
 
-.statusItem{
-  font-size: 14px;
+.voteModalBtn{
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 14px 10px;
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: transform .1s ease, background .15s ease, border-color .15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.voteModalBtn img{
+  width: 80px;
+  height: auto;
+}
+
+.voteModalBtn span{
+  font-size: 16px;
   font-weight: 900;
-  color: rgba(0,0,0,0.75);
+  letter-spacing: 2px;
+  color: #f7efe5;
+}
+
+.voteModalBtn:hover{
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+}
+
+.voteModalBtn:active{
+  transform: translateY(1px);
+}
+
+.voteModalJa:hover{
+  border-color: rgba(125,216,125,0.6);
+  background: rgba(125,216,125,0.1);
+}
+
+.voteModalNein:hover{
+  border-color: rgba(242,106,80,0.6);
+  background: rgba(242,106,80,0.1);
+}
+
+.voteModalWait{
+  font-size: 14px;
+  font-weight: 800;
+  color: rgba(255,214,150,0.8);
+  padding: 16px 0 4px;
+}
+
+.hidden{ display: none !important; }
+
+/* ============ Vote Result Overlay ============ */
+.voteResultOverlay{
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: rgba(0,0,0,0.6);
+  place-items: center;
+}
+
+.voteResultOverlay.open{
+  display: grid;
+}
+
+.voteResultPanel{
+  background: #15120f;
+  color: #f7efe5;
+  border-radius: 18px;
+  padding: 20px 24px;
+  border: 2px solid rgba(255,214,150,0.3);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  text-align: center;
+  min-width: 280px;
+  animation: voteResultIn 0.3s ease;
+}
+
+@keyframes voteResultIn{
+  from{ opacity: 0; transform: scale(0.9); }
+  to{ opacity: 1; transform: scale(1); }
+}
+
+.voteResultTitle{
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.voteResultTitle.passed{ color: #7dd87d; }
+.voteResultTitle.failed{ color: #f26a50; }
+
+.voteResultTally{
+  font-size: 16px;
+  margin-bottom: 14px;
+  color: rgba(255,255,255,0.7);
+}
+
+.voteResultGrid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.voteResultEntry{
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.voteResultJa{
+  background: rgba(125,216,125,0.15);
+  border: 1px solid rgba(125,216,125,0.4);
+  color: #7dd87d;
+}
+
+.voteResultNein{
+  background: rgba(242,106,80,0.15);
+  border: 1px solid rgba(242,106,80,0.4);
+  color: #f26a50;
+}
+
+/* ============ Election Modal ============ */
+.electionModal{
+  width: min(520px, 92vw);
+  animation: modalIn 0.25s ease;
+}
+
+.electionModal .roomElection{
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .roomElection{
-  width: min(520px, 94%);
+  width: 100%;
   background: rgba(255,255,255,0.7);
-  border-radius: 16px;
-  padding: 12px;
-  box-shadow: 0 8px 0 rgba(0,0,0,0.2);
-  border: 2px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  padding: 10px;
 }
 
 .roomPlayerList .playerRow{
@@ -649,6 +999,7 @@ body{
   font-weight: 900;
   cursor: pointer;
   background: rgba(0,0,0,0.12);
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
 .electBtnPrimary{
@@ -656,101 +1007,97 @@ body{
   color: #fff;
 }
 
+.electBtnPrimary:hover{ background: #333; }
+
 .electBtn[disabled]{
   opacity: 0.6;
   cursor: not-allowed;
 }
-.voteBtn{
-  border: 3px solid rgba(0,0,0,0.18);
-  border-radius: 12px;
-  padding: 10px;
+
+/* ============ Action Modal ============ */
+.actionModal{
+  width: min(560px, 94vw);
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn{
+  from{ opacity: 0; transform: translateY(8px) scale(0.97); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.actionBody{
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.actionList{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.actionBtn{
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-weight: 900;
+  cursor: pointer;
+  background: rgba(0,0,0,0.12);
+}
+
+.actionBtnPrimary{
+  background: #1f1f1f;
+  color: #fff;
+}
+
+.actionBtnPrimary:hover{ background: #333; }
+
+.actionHint{
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.6);
+  padding: 6px 0;
+}
+
+.btnVeto{
+  background: rgba(242,106,80,0.15);
+  border: 1px solid rgba(242,106,80,0.4);
+  color: #c0503a;
+}
+
+.btnVeto:hover{ background: rgba(242,106,80,0.25); }
+
+/* ============ Policy Cards ============ */
+.policyRow{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.policyCard{
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 10px;
+  padding: 6px;
   background: #efe6c8;
   cursor: pointer;
-  box-shadow: 0 7px 0 rgba(0,0,0,0.22);
-  width: 100%;
-  transition: transform .08s ease, box-shadow .08s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.voteBtn:active{
-  transform: translateY(2px);
-  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+.policyCard:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
-.voteImg{
+.policyCard img{
   width: 100%;
   height: auto;
   display: block;
 }
 
-@media (max-width: 900px){
-  .roomTop{
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-
-  .roomTopRight{
-    justify-items: center;
-  }
-
-  .roomGrid{
-    grid-template-columns: 1fr;
-  }
-}
-.flipCard{
-  width: 100%;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-  perspective: 900px;
-}
-
-.flipInner{
-  display: grid;
-  transform-style: preserve-3d;
-  transition: transform .6s ease;
-}
-
-.flipFace{
-  grid-area: 1 / 1;
-  backface-visibility: hidden;
-}
-
-.flipFront{
-  transform: rotateY(180deg);
-}
-
-.flipCard.is-flipped .flipInner{
-  transform: rotateY(180deg);
-}
-
-.flipCard:focus-visible{
-  outline: 3px solid rgba(0,0,0,0.5);
-  outline-offset: 4px;
-  border-radius: 10px;
-}
-
-
-
-
-
-
-.electionModal{
-  width: min(520px, 92vw);
-}
-
-.electionModal .roomElection{
-  width: 100%;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.actionModal{
-  width: min(560px, 94vw);
-}
-
+/* ============ End Screen ============ */
 .endOverlay{
   z-index: 30;
   background: radial-gradient(circle at top, rgba(240,210,160,0.3), rgba(0,0,0,0.75));
@@ -758,6 +1105,8 @@ body{
 
 .endPanel{
   width: min(920px, 94vw);
+  max-height: 90vh;
+  overflow-y: auto;
   background: #15120f;
   color: #f7efe5;
   border-radius: 20px;
@@ -797,36 +1146,31 @@ body{
   color: rgba(255,255,255,0.7);
 }
 
-.endContent{
-  display: grid;
-  gap: 16px;
-}
+.endContent{ display: grid; gap: 16px; }
 
 .endStats{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
 }
 
 .endStatCard{
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 14px;
-  padding: 12px;
+  padding: 10px;
   display: grid;
   gap: 4px;
 }
 
 .endStatLabel{
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(255,255,255,0.6);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
-.endStatValue{
-  font-size: 22px;
-}
+.endStatValue{ font-size: 20px; }
 
 .endRoles{
   background: rgba(0,0,0,0.25);
@@ -860,15 +1204,8 @@ body{
   padding: 8px 10px;
 }
 
-.endRoleName{
-  font-size: 14px;
-}
-
-.endRoleMeta{
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
+.endRoleName{ font-size: 14px; }
+.endRoleMeta{ display: flex; gap: 6px; align-items: center; }
 
 .roleTag{
   font-size: 11px;
@@ -878,25 +1215,10 @@ body{
   letter-spacing: 1px;
 }
 
-.roleTagLiberal{
-  background: rgba(101,179,191,0.25);
-  border: 1px solid rgba(101,179,191,0.6);
-}
-
-.roleTagFascist{
-  background: rgba(242,106,80,0.25);
-  border: 1px solid rgba(242,106,80,0.6);
-}
-
-.roleTagHitler{
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,214,150,0.6);
-}
-
-.roleTagDead{
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-}
+.roleTagLiberal{ background: rgba(101,179,191,0.25); border: 1px solid rgba(101,179,191,0.6); }
+.roleTagFascist{ background: rgba(242,106,80,0.25); border: 1px solid rgba(242,106,80,0.6); }
+.roleTagHitler{ background: rgba(0,0,0,0.4); border: 1px solid rgba(255,214,150,0.6); }
+.roleTagDead{ background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); }
 
 .endActions{
   display: flex;
@@ -904,83 +1226,25 @@ body{
   margin-top: 14px;
 }
 
+/* ============ Dissolve Animation ============ */
 .roomScreen.is-dissolving{
   animation: roomDissolve 0.8s ease forwards;
 }
 
 @keyframes roomDissolve{
-  to{
-    opacity: 0;
-    transform: scale(0.98);
-  }
+  to{ opacity: 0; transform: scale(0.98); }
 }
 
-.actionBody{
-  display: grid;
-  gap: 10px;
-  margin-top: 6px;
+/* ============ Button States ============ */
+.btnSmall{
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
-.actionList{
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 8px;
+.btnSmall:hover{ filter: brightness(1.1); }
+.btnSmall:active{ transform: scale(0.97); }
+
+.btn{
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
 }
 
-.actionBtn{
-  border: 0;
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-weight: 900;
-  cursor: pointer;
-  background: rgba(0,0,0,0.12);
-}
-
-.actionBtnPrimary{
-  background: #1f1f1f;
-  color: #fff;
-}
-
-.policyRow{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
-}
-
-.policyCard{
-  border: 2px solid rgba(0,0,0,0.2);
-  border-radius: 10px;
-  padding: 6px;
-  background: #efe6c8;
-  cursor: pointer;
-}
-
-.policyCard img{
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.roomTitleWrap{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.roomStatusInline{
-  width: min(420px, 60vw);
-  background: rgba(255,255,255,0.55);
-  box-shadow: 0 4px 0 rgba(0,0,0,0.18);
-  border-radius: 12px;
-}
-
-.roomStatusInline .statusRow{
-  grid-template-columns: 1fr 1fr;
-}
-
-.roomStatusInline .statusItem{
-  font-size: 12px;
-}
+.btn:hover{ filter: brightness(1.1); }
